@@ -1,0 +1,11 @@
+<app-graph-view [nodes]="nodes" [edges]="edges" [readonly]="false"></app-graph-view>
+
+<button mat-button (click)="clear()">Clear</button>
+
+<button mat-button (click)="mock()">Mock</button>
+
+<div *ngIf="result">
+  {{result.toString()}}
+</div>
+
+<button mat-button (click)="print()">Get Prufer Sequence</button>
