@@ -1,6 +1,7 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import * as vis from 'vis';
 import {Data, Edge, Node} from 'vis';
+import {ExtNode} from '../custom-types';
 
 
 @Component({
@@ -17,39 +18,42 @@ export class GraphViewComponent implements OnInit {
   data: Data;
   result: number[];
 
+
   ngOnInit(): void {
+    this.initNetwork();
+  }
+
+  mock() {
+    this.edges = [
+      {from: 1, to: 3},
+      {from: 1, to: 2},
+      {from: 1, to: 4},
+      {from: 3, to: 5},
+      {from: 5, to: 6},
+      {from: 5, to: 7}
+    ];
+    this.nodes = [
+      {id: 1, label: '1', title: 'I have a popup!'},
+      {id: 2, label: '2', title: 'I have a popup!'},
+      {id: 3, label: '3', title: 'I have a popup!'},
+      {id: 4, label: '4', title: 'I have a popup!'},
+      {id: 5, label: '5', title: 'I have a popup!'},
+      {id: 6, label: '6', title: 'I have a popup!'},
+      {id: 7, label: '7', title: 'I have a popup!'}
+    ];
     this.initNetwork();
   }
 
   initNetwork() {
     if (!this.edges) {
-      this.edges = [
-        {from: 1, to: 3},
-        {from: 1, to: 2},
-        {from: 1, to: 4},
-        {from: 3, to: 5},
-        {from: 5, to: 6},
-        {from: 5, to: 7}
-      ];
+      this.edges = [];
     }
-
     const edges = new vis.DataSet(this.edges);
 
     if (!this.nodes) {
-      this.nodes = [
-        {id: 1, label: 'Node 1', title: 'I have a popup!'},
-        {id: 2, label: 'Node 2', title: 'I have a popup!'},
-        {id: 3, label: 'Node 3', title: 'I have a popup!'},
-        {id: 4, label: 'Node 4', title: 'I have a popup!'},
-        {id: 5, label: 'Node 5', title: 'I have a popup!'},
-        {id: 6, label: 'Node 6', title: 'I have a popup!'},
-        {id: 7, label: 'Node 7', title: 'I have a popup!'}
-      ];
-      // create an array with edges
-
+      this.nodes = [];
     }
     const nodes = new vis.DataSet(this.nodes);
-
 
     this.data = {
       nodes: nodes,
@@ -64,8 +68,6 @@ export class GraphViewComponent implements OnInit {
           nodeData.id = nodes.length + 1;
           nodeData.label = String(nodes.length + 1);
           callback(nodeData);
-          console.log(JSON.stringify(nodes));
-          console.log(JSON.stringify(edges));
         },
         addEdge: function (edgeData, callback) {
           if (edgeData.from !== edgeData.to) {
@@ -78,6 +80,8 @@ export class GraphViewComponent implements OnInit {
   }
 
   clear() {
+    this.edges = [];
+    this.nodes = [];
     this.initNetwork();
   }
 
@@ -91,23 +95,23 @@ export class GraphViewComponent implements OnInit {
     }
     const result = [];
     const n = tree.nodes.length;
-    const tempTree = this.deepCopyTree(tree);
-    while (true) {
-      const currMin = this.getMinLeafId(tempTree);
-      if (currMin) {
-        const adjacentNodes = this.getAdjacentNodes(currMin, tempTree.edges);
-        result.push(adjacentNodes[0]);
-        (tempTree.nodes as vis.DataSet<Node>).remove(currMin.id);
-        (tempTree.edges as vis.DataSet<Edge>).remove(this.getAdjacentEdges(currMin.id, tempTree.edges).map(p => p.id));
-        if (result.length === (n - 2)) {
-          break;
-        }
-      } else {
-        break;
-      }
+    const nodes = this.getExtNodeList(this.deepCopyTree(tree));
+    while (result.length !== (n - 2)) {
+      const current = this.getMinLeaf(nodes);
+      result.push(current.adj[0].id);
+      this.removeNode(current, nodes);
     }
-
     return result;
+  }
+
+  removeNode(node: ExtNode, nodes: ExtNode[]) {
+    nodes.forEach(adj => {
+      const index = adj.adj.indexOf(node);
+      if (index > -1) {
+        adj.adj.splice(index, 1);
+      }
+    });
+    nodes.splice(nodes.indexOf(node), 1);
   }
 
   deepCopyTree(tree: Data): Data {
@@ -123,26 +127,28 @@ export class GraphViewComponent implements OnInit {
     return tempTree;
   }
 
-  getAdjacentEdges(nodeId: any, edges: any): Edge[] {
-    const adjacentEdges = new Set();
-    (edges as vis.DataSet<Edge>).forEach(edge => {
-      if (edge.from !== edge.to) {
-        if (edge.from === nodeId || edge.to === nodeId) {
-          adjacentEdges.add(edge);
-        }
-      }
+  getExtNodeList(tree: Data): ExtNode[] {
+    const result: ExtNode[] = (tree.nodes as vis.DataSet<Node>).map(node => {
+      return {id: String(node.id), adj: []};
     });
-    return Array.from(adjacentEdges);
+    result.forEach(node => {
+      const adjacentNodes = this.getAdjacentNodes(node.id, tree.edges);
+      node.adj = result
+        .filter(tmp => adjacentNodes
+          .map(String)
+          .includes(tmp.id));
+    });
+    return result;
   }
 
   getAdjacentNodes(nodeId: any, edges: any): any[] {
     const adjacentNodeSet = new Set();
     (edges as vis.DataSet<Edge>).forEach(item => {
       if (item.from !== item.to) {
-        if (item.from === nodeId.id) {
+        if (item.from == nodeId) {
           adjacentNodeSet.add(item.to);
         }
-        if (item.to === nodeId.id) {
+        if (item.to == nodeId) {
           adjacentNodeSet.add(item.from);
         }
       }
@@ -150,20 +156,17 @@ export class GraphViewComponent implements OnInit {
     return Array.from(adjacentNodeSet);
   }
 
-
-  getMinLeafId(tree: Data): Node {
-    let min: any;
-    (tree.nodes as vis.DataSet<Node>).forEach(item => {
-      if (this.isLeaf(item, (tree.edges as vis.DataSet<Edge>))) {
-        if (!min || min > item.id) {
-          min = item;
-        }
+  getMinLeaf(nodes: ExtNode[]): ExtNode {
+    let min: ExtNode = null;
+    nodes.forEach(node => {
+      if (this.isLeaf(node) && (!min || min.id > node.id)) {
+        min = node;
       }
     });
     return min;
   }
 
-  isLeaf(nodeId: any, edges: any): boolean {
-    return this.getAdjacentNodes(nodeId, edges).length === 1;
+  isLeaf(node: ExtNode): boolean {
+    return node.adj.length === 1;
   }
 }
