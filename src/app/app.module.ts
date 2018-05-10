@@ -7,8 +7,12 @@ import {AppComponent} from './app.component';
 import {GraphViewComponent} from './graph-view/graph-view.component';
 import {GenerateSequenceComponent} from './generate-sequence/generate-sequence.component';
 import {GenerateTreeComponent} from './generate-tree/generate-tree.component';
-import {MatButtonModule, MatDividerModule} from '@angular/material';
+import {
+  MatButtonModule, MatDividerModule, MatFormFieldModule, MatGridListModule, MatInputModule, MatTabsModule,
+  MatToolbarModule
+} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {FormsModule} from '@angular/forms';
 
 
 @NgModule({
@@ -22,7 +26,13 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     BrowserModule,
     MatDividerModule,
-    MatButtonModule
+    MatButtonModule,
+    MatToolbarModule,
+    MatTabsModule,
+    MatGridListModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

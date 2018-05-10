@@ -1,3 +1,11 @@
-<app-generate-sequence></app-generate-sequence>
-<mat-divider></mat-divider>
-<app-generate-tree></app-generate-tree>
+<mat-toolbar>
+  <span>Pr&#252;ferCode</span>
+</mat-toolbar>
+<mat-tab-group>
+  <mat-tab label="Tree-to-sequence">
+    <app-generate-sequence></app-generate-sequence>
+  </mat-tab>
+  <mat-tab label="Sequence-to-tree">
+    <app-generate-tree></app-generate-tree>
+  </mat-tab>
+</mat-tab-group>
