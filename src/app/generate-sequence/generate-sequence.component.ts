@@ -2,6 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {Data, Edge, Node} from 'vis';
 import {ExtNode} from '../custom-types';
 import * as vis from 'vis';
+import {MatDialog, MatDialogRef} from '@angular/material';
+import {ResultDialogComponent} from './dialog/result-dialog/result-dialog.component';
+import {InputJsonDialogComponent} from './dialog/input-json-dialog/input-json-dialog.component';
+import {filter} from 'rxjs/operators';
 
 @Component({
   selector: 'app-generate-sequence',
@@ -11,9 +15,10 @@ import * as vis from 'vis';
 export class GenerateSequenceComponent implements OnInit {
   nodes: vis.DataSet<Node>;
   edges: vis.DataSet<Edge>;
-  result: number[];
+  displayResultDialog: MatDialogRef<ResultDialogComponent>;
+  inputJsonDialog: MatDialogRef<InputJsonDialogComponent>;
 
-  constructor() {
+  constructor(public dialog: MatDialog) {
   }
 
   ngOnInit() {
@@ -25,15 +30,15 @@ export class GenerateSequenceComponent implements OnInit {
     this.edges = new vis.DataSet([]);
   }
 
-  print() {
+  getResult() {
     if (this.nodes.length > 0 && this.edges.length > 0) {
-      this.result = this.getPruferSequence({edges: this.edges, nodes: this.nodes});
+      this.displayResultDialog =
+        this.dialog.open(ResultDialogComponent, {data: this.getPruferSequence({edges: this.edges, nodes: this.nodes})});
     }
   }
 
   clear() {
     this.init();
-    this.result = null;
   }
 
   getPruferSequence(tree: Data): number[] {
@@ -120,5 +125,17 @@ export class GenerateSequenceComponent implements OnInit {
       {from: 5, to: 6},
       {from: 5, to: 7}
     ]);
+  }
+
+  openInputJsonDialog() {
+    this.dialog.open(InputJsonDialogComponent).afterClosed().pipe(
+      filter(input => input)
+    ).subscribe(input => {
+      if (input) {
+        const tree = JSON.parse(input);
+        this.nodes = new vis.DataSet<Node>(tree.nodes);
+        this.edges = new vis.DataSet<Edge>(tree.edges);
+      }
+    });
   }
 }

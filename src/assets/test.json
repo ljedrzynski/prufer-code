@@ -1,0 +1,65 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "label": "1",
+      "title": "I have a popup!"
+    },
+    {
+      "id": 2,
+      "label": "2",
+      "title": "I have a popup!"
+    },
+    {
+      "id": 3,
+      "label": "3",
+      "title": "I have a popup!"
+    },
+    {
+      "id": 4,
+      "label": "4",
+      "title": "I have a popup!"
+    },
+    {
+      "id": 5,
+      "label": "5",
+      "title": "I have a popup!"
+    },
+    {
+      "id": 6,
+      "label": "6",
+      "title": "I have a popup!"
+    },
+    {
+      "id": 7,
+      "label": "7",
+      "title": "I have a popup!"
+    }
+  ],
+  "edges": [
+    {
+      "from": 1,
+      "to": 3
+    },
+    {
+      "from": 1,
+      "to": 2
+    },
+    {
+      "from": 1,
+      "to": 4
+    },
+    {
+      "from": 3,
+      "to": 5
+    },
+    {
+      "from": 5,
+      "to": 6
+    },
+    {
+      "from": 5,
+      "to": 7
+    }
+  ]
+}

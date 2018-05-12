@@ -8,11 +8,13 @@ import {GraphViewComponent} from './graph-view/graph-view.component';
 import {GenerateSequenceComponent} from './generate-sequence/generate-sequence.component';
 import {GenerateTreeComponent} from './generate-tree/generate-tree.component';
 import {
-  MatButtonModule, MatDividerModule, MatFormFieldModule, MatGridListModule, MatInputModule, MatTabsModule,
+  MatButtonModule, MatDialogModule, MatDividerModule, MatFormFieldModule, MatGridListModule, MatInputModule, MatTabsModule,
   MatToolbarModule
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ResultDialogComponent} from './generate-sequence/dialog/result-dialog/result-dialog.component';
+import {InputJsonDialogComponent} from './generate-sequence/dialog/input-json-dialog/input-json-dialog.component';
 
 
 @NgModule({
@@ -20,7 +22,9 @@ import {FormsModule} from '@angular/forms';
     AppComponent,
     GraphViewComponent,
     GenerateSequenceComponent,
-    GenerateTreeComponent
+    GenerateTreeComponent,
+    ResultDialogComponent,
+    InputJsonDialogComponent
   ],
   imports: [
     BrowserAnimationsModule,
@@ -32,7 +36,12 @@ import {FormsModule} from '@angular/forms';
     MatGridListModule,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+  ], entryComponents: [
+    ResultDialogComponent,
+    InputJsonDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

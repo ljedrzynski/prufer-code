@@ -1,0 +1,13 @@
+<form [formGroup]="form" (ngSubmit)="submit(form)">
+  <h1 mat-dialog-title>JSON Input:</h1>
+  <mat-dialog-content>
+    <mat-form-field>
+      <textarea matInput formControlName="input" rows="30" cols="120">
+  </textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button type="submit">Add</button>
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+  </mat-dialog-actions>
+</form>
