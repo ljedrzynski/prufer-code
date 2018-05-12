@@ -3,7 +3,6 @@ import * as vis from 'vis';
 import {Node} from 'vis';
 import {Edge} from 'vis';
 import {NgForm} from '@angular/forms';
-import {ExtNode} from '../custom-types';
 
 @Component({
   selector: 'app-generate-tree',
@@ -23,31 +22,52 @@ export class GenerateTreeComponent implements OnInit {
 
   decodeSequence(form: NgForm) {
     if (form.valid) {
-      this.generateTree(this.sequence.split(','));
+      this.generateTree(this.sequence.split(',')
+        .map(s => Number(s)));
     }
 
   }
 
-  generateTree(sequence: string[]) {
+  generateTree(sequence: number[]) {
     const n = sequence.length + 2;
-    const nodes: Node[] = [];
+    const nodes: Node[] = this.getEmptyNodeList(n);
     const edges: Edge[] = [];
-    for (let i = 1; i <= n; i++) {
-      nodes.push({id: i, label: String(i)});
+    const degree = nodes.map(() => 1);
+    sequence.forEach(s => degree[s - 1] += 1);
+    let from, to;
+    for (let i = 0; i < sequence.length; i++) {
+      for (let j = 0; j < nodes.length; j++) {
+        if (degree[j] === 1) {
+          from = +sequence[i];
+          to = +nodes[j].id;
+          degree[from - 1] -= 1;
+          degree[to - 1] -= 1;
+          edges.push({from: from, to: to});
+          break;
+        }
+      }
     }
-    const tempSequence = Object.assign([], sequence);
-    const tempNodes = Object.assign([], nodes);
-    
-
-    //
-    // nodes.forEach(x => {
-    //   x.adj.forEach(a => {
-    //     if (resultEdges.filter(re => re.from === a.id && re.to === x.id || re.from === x.id && re.to === a.id)) {
-    //       resultEdges.push({from: a.id, to: x.id});
-    //     }
-    //   });
-    // });
+    from = to = null;
+    for (let i = 0; i < nodes.length; i++) {
+      if (degree[i] === 1) {
+        if (!from) {
+          from = nodes[i].id;
+        } else {
+          to = nodes[i].id;
+          break;
+        }
+      }
+    }
+    edges.push({from: from, to: to});
     this.edges = new vis.DataSet<Edge>(edges);
     this.nodes = new vis.DataSet<Node>(nodes);
+  }
+
+  getEmptyNodeList(size: number): Node[] {
+    const nodes = [];
+    for (let i = 1; i <= size; i++) {
+      nodes.push({id: i, label: String(i)});
+    }
+    return nodes;
   }
 }

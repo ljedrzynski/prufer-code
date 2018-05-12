@@ -37,13 +37,9 @@ export class GenerateSequenceComponent implements OnInit {
   }
 
   getPruferSequence(tree: Data): number[] {
-    if (!(tree && tree.nodes && tree.edges)) {
-      return [];
-    }
     const result = [];
-    const n = tree.nodes.length;
     const nodes = this.getExtNodeList(this.deepCopyTree(tree));
-    while (result.length !== (n - 2)) {
+    while (result.length !== (tree.nodes.length - 2)) {
       const current = this.getMinLeaf(nodes);
       result.push(current.adj[0].id);
       this.removeNode(current, nodes);
