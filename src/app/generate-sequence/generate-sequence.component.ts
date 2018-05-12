@@ -62,16 +62,10 @@ export class GenerateSequenceComponent implements OnInit {
   }
 
   deepCopyTree(tree: Data): Data {
-    const tempTree: Data = {};
-    tempTree.nodes = new vis.DataSet<Node>();
-    (tree.nodes as vis.DataSet<Node>).forEach(item => {
-      (tempTree.nodes  as vis.DataSet<Node>).add(Object.assign(<Node>{}, item));
-    });
-    tempTree.edges = new vis.DataSet<Edge>();
-    (tree.edges as vis.DataSet<Edge>).forEach(item => {
-      (tempTree.edges as vis.DataSet<Edge>).add(Object.assign(<Edge>{}, item));
-    });
-    return tempTree;
+    return {
+      nodes: (tree.nodes as vis.DataSet<Node>).map(item => Object.assign(<Node>{}, item)),
+      edges: (tree.edges as vis.DataSet<Edge>).map(item => Object.assign(<Edge>{}, item))
+    };
   }
 
   getExtNodeList(tree: Data): ExtNode[] {
@@ -104,13 +98,8 @@ export class GenerateSequenceComponent implements OnInit {
   }
 
   getMinLeaf(nodes: ExtNode[]): ExtNode {
-    let min: ExtNode = null;
-    nodes.forEach(node => {
-      if (this.isLeaf(node) && (!min || min.id > node.id)) {
-        min = node;
-      }
-    });
-    return min;
+    return nodes.reduce((prev, curr) =>
+      this.isLeaf(prev) && prev.id < curr.id ? prev : curr);
   }
 
   isLeaf(node: ExtNode): boolean {
@@ -118,15 +107,7 @@ export class GenerateSequenceComponent implements OnInit {
   }
 
   mock() {
-    const edges = [
-      {from: 1, to: 3},
-      {from: 1, to: 2},
-      {from: 1, to: 4},
-      {from: 3, to: 5},
-      {from: 5, to: 6},
-      {from: 5, to: 7}
-    ];
-    const nodes = [
+    this.nodes = new vis.DataSet([
       {id: 1, label: '1', title: 'I have a popup!'},
       {id: 2, label: '2', title: 'I have a popup!'},
       {id: 3, label: '3', title: 'I have a popup!'},
@@ -134,8 +115,14 @@ export class GenerateSequenceComponent implements OnInit {
       {id: 5, label: '5', title: 'I have a popup!'},
       {id: 6, label: '6', title: 'I have a popup!'},
       {id: 7, label: '7', title: 'I have a popup!'}
-    ];
-    this.nodes = new vis.DataSet(nodes);
-    this.edges = new vis.DataSet(edges);
+    ]);
+    this.edges = new vis.DataSet([
+      {from: 1, to: 3},
+      {from: 1, to: 2},
+      {from: 1, to: 4},
+      {from: 3, to: 5},
+      {from: 5, to: 6},
+      {from: 5, to: 7}
+    ]);
   }
 }
