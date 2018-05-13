@@ -1,12 +1,15 @@
-<form #heroForm="ngForm" (ngSubmit)="decodeSequence(heroForm)">
+<form [formGroup]="form" (ngSubmit)="submit(form)">
   <span matPrefix>[</span>
   <mat-form-field>
-    <input matInput name="sequence" placeholder="1,2,3,4,..." pattern="[1-9]+(,[0-9]+)*" value="1,1,3,5,5"
-           [(ngModel)]="sequence"
-           [ngModelOptions]="{standalone: true}" required>
+    <input matInput formControlName="sequenceFormControl" placeholder="1,2,3,4,..." #sequenceFormControl>
   </mat-form-field>
   <span matPrefix>]</span>
   <button mat-button type="submit">Decode</button>
+  <mat-error
+    *ngIf="(form.controls['sequenceFormControl'].touched || form.controls['sequenceFormControl'].dirty) &&
+    form.controls['sequenceFormControl'].invalid">
+    Please enter a <strong>valid</strong> Pr&#252;fer number sequence
+  </mat-error>
 </form>
 
 <app-graph-view [nodes]="nodes" [edges]="edges" [readonly]="true"></app-graph-view>

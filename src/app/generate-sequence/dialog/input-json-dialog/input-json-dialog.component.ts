@@ -9,9 +9,8 @@ import {MatDialogRef} from '@angular/material';
 })
 export class InputJsonDialogComponent implements OnInit {
   form: FormGroup;
-  input: string;
 
-  constructor(private formBuilder: FormBuilder, private dialogRef: MatDialogRef<InputJsonDialogComponent>) {
+  constructor(private dialog: MatDialogRef<InputJsonDialogComponent>, private formBuilder: FormBuilder) {
   }
 
   ngOnInit() {
@@ -21,6 +20,6 @@ export class InputJsonDialogComponent implements OnInit {
   }
 
   submit(form) {
-    this.dialogRef.close(`${form.value.input}`);
+    this.dialog.close(`${form.value.input}`);
   }
 }

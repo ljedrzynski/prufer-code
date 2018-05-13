@@ -2,38 +2,31 @@
   "nodes": [
     {
       "id": 1,
-      "label": "1",
-      "title": "I have a popup!"
+      "label": "1"
     },
     {
       "id": 2,
-      "label": "2",
-      "title": "I have a popup!"
+      "label": "2"
     },
     {
       "id": 3,
-      "label": "3",
-      "title": "I have a popup!"
+      "label": "3"
     },
     {
       "id": 4,
-      "label": "4",
-      "title": "I have a popup!"
+      "label": "4"
     },
     {
       "id": 5,
-      "label": "5",
-      "title": "I have a popup!"
+      "label": "5"
     },
     {
       "id": 6,
-      "label": "6",
-      "title": "I have a popup!"
+      "label": "6"
     },
     {
       "id": 7,
-      "label": "7",
-      "title": "I have a popup!"
+      "label": "7"
     }
   ],
   "edges": [

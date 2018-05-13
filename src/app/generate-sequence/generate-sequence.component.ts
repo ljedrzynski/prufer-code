@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {Data, Edge, Node} from 'vis';
-import {ExtNode} from '../custom-types';
 import * as vis from 'vis';
-import {MatDialog, MatDialogRef} from '@angular/material';
-import {ResultDialogComponent} from './dialog/result-dialog/result-dialog.component';
+import {Edge, Node} from 'vis';
+import {MatDialog} from '@angular/material';
+import {MessageDialog} from './dialog/message-dialog/message-dialog.component';
 import {InputJsonDialogComponent} from './dialog/input-json-dialog/input-json-dialog.component';
 import {filter} from 'rxjs/operators';
+import {TreeUtils} from '../shared/tree.utils';
 
 @Component({
   selector: 'app-generate-sequence',
@@ -15,8 +15,6 @@ import {filter} from 'rxjs/operators';
 export class GenerateSequenceComponent implements OnInit {
   nodes: vis.DataSet<Node>;
   edges: vis.DataSet<Edge>;
-  displayResultDialog: MatDialogRef<ResultDialogComponent>;
-  inputJsonDialog: MatDialogRef<InputJsonDialogComponent>;
 
   constructor(public dialog: MatDialog) {
   }
@@ -30,81 +28,23 @@ export class GenerateSequenceComponent implements OnInit {
     this.edges = new vis.DataSet([]);
   }
 
-  getResult() {
-    if (this.nodes.length > 0 && this.edges.length > 0) {
-      this.displayResultDialog =
-        this.dialog.open(ResultDialogComponent, {data: this.getPruferSequence({edges: this.edges, nodes: this.nodes})});
+  getSequence() {
+    const tree = {edges: this.edges, nodes: this.nodes};
+    if (this.validate(tree)) {
+      this.dialog.open(MessageDialog, {data: {title: 'Result sequence:', message: TreeUtils.getPruferSequence(tree)}});
     }
   }
 
-  clear() {
-    this.init();
-  }
-
-  getPruferSequence(tree: Data): number[] {
-    const result = [];
-    const nodes = this.getExtNodeList(this.deepCopyTree(tree));
-    while (result.length !== (tree.nodes.length - 2)) {
-      const current = this.getMinLeaf(nodes);
-      result.push(current.adj[0].id);
-      this.removeNode(current, nodes);
+  validate(tree: vis.Data): boolean {
+    if (tree.nodes.length === 0 || tree.edges.length === 0) {
+      this.dialog.open(MessageDialog, {data: {title: 'Tree is not valid', message: 'Empty nodes or edges'}});
+      return false;
     }
-    return result;
-  }
-
-  removeNode(node: ExtNode, nodes: ExtNode[]) {
-    nodes.forEach(adj => {
-      const index = adj.adj.indexOf(node);
-      if (index > -1) {
-        adj.adj.splice(index, 1);
-      }
-    });
-    nodes.splice(nodes.indexOf(node), 1);
-  }
-
-  deepCopyTree(tree: Data): Data {
-    return {
-      nodes: (tree.nodes as vis.DataSet<Node>).map(item => Object.assign(<Node>{}, item)),
-      edges: (tree.edges as vis.DataSet<Edge>).map(item => Object.assign(<Edge>{}, item))
-    };
-  }
-
-  getExtNodeList(tree: Data): ExtNode[] {
-    const result: ExtNode[] = (tree.nodes as vis.DataSet<Node>).map(node => {
-      return {id: String(node.id), adj: []};
-    });
-    result.forEach(node => {
-      const adjacentNodes = this.getAdjacentNodes(node.id, tree.edges);
-      node.adj = result
-        .filter(tmp => adjacentNodes
-          .map(String)
-          .includes(tmp.id));
-    });
-    return result;
-  }
-
-  getAdjacentNodes(nodeId: any, edges: any): any[] {
-    const adjacentNodeSet = new Set();
-    (edges as vis.DataSet<Edge>).forEach(item => {
-      if (item.from !== item.to) {
-        if (item.from == nodeId) {
-          adjacentNodeSet.add(item.to);
-        }
-        if (item.to == nodeId) {
-          adjacentNodeSet.add(item.from);
-        }
-      }
-    });
-    return Array.from(adjacentNodeSet);
-  }
-
-  getMinLeaf(nodes: ExtNode[]): ExtNode {
-    return nodes.reduce((prev, curr) =>
-      this.isLeaf(prev) && prev.id < curr.id ? prev : curr);
-  }
-
-  isLeaf(node: ExtNode): boolean {
-    return node.adj.length === 1;
+    if (TreeUtils.validateCycle(tree)) {
+      this.dialog.open(MessageDialog, {data: {title: 'Tree is not valid', message: 'Detected cycle'}});
+      return false;
+    }
+    return true;
   }
 
   mock() {
@@ -137,5 +77,9 @@ export class GenerateSequenceComponent implements OnInit {
         this.edges = new vis.DataSet<Edge>(tree.edges);
       }
     });
+  }
+
+  clear() {
+    this.init();
   }
 }

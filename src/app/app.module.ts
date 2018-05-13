@@ -13,8 +13,9 @@ import {
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ResultDialogComponent} from './generate-sequence/dialog/result-dialog/result-dialog.component';
+import {MessageDialog} from './generate-sequence/dialog/message-dialog/message-dialog.component';
 import {InputJsonDialogComponent} from './generate-sequence/dialog/input-json-dialog/input-json-dialog.component';
+import {TreeUtils} from './shared/tree.utils';
 
 
 @NgModule({
@@ -23,7 +24,7 @@ import {InputJsonDialogComponent} from './generate-sequence/dialog/input-json-di
     GraphViewComponent,
     GenerateSequenceComponent,
     GenerateTreeComponent,
-    ResultDialogComponent,
+    MessageDialog,
     InputJsonDialogComponent
   ],
   imports: [
@@ -40,7 +41,7 @@ import {InputJsonDialogComponent} from './generate-sequence/dialog/input-json-di
     ReactiveFormsModule,
     MatDialogModule,
   ], entryComponents: [
-    ResultDialogComponent,
+    MessageDialog,
     InputJsonDialogComponent
   ],
   providers: [],
